@@ -1,0 +1,24 @@
+
+{% extends 'admin/base.html' %}
+{%load static%}
+{% block title%} 
+Admin  Area
+{% endblock %}
+{% block branding %}
+
+<h1 id="head">
+    {% if settings and settings.logo %}
+    <img src="{{settings.logo.url}}" class="logo" alt="{{settings.title}} " title="{{settings.title}} ">
+
+    {%else%}
+    <img src="{%static 'img/logo.png' %}" alt="eState Logo" class="brand_img" height="80" width="50">
+    {%endif%}
+    Admin Area  
+</h1>
+
+{%endblock%}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{%static 'css/admin.css' %}">
+{%endblock%}
+

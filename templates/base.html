@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="{% static 'css/all.css' %}">
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <!-- Custom -->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+      
+        <title>
+          {% if settings %}
+          {{settings.title}} 
+
+          {%else%}
+           MyApp 
+          {%endif%}
+          {% block title%} {% endblock %}
+        </title>
+      </head>
+      <style>
+        #showcase {
+            background-image: url({% static "img/showcase.jpg" %});
+        }
+        .bg-primary{
+          /*background-color:{{settings.theme_color}} !important  ;*/
+        }
+
+
+.header {
+  {% if settings.logo %}
+  background-image: linear-gradient(to bottom right , rgba(0,0,0,.8),rgba(0,0,0,.6)),url(
+    
+  {{settings.logo.url}});
+
+          {%endif%}
+}
+
+     </style>
+    <body>
+        <!-- topbar section -->
+        <!-- navbar section -->
+
+
+        <!-- conent block start -->
+        {% block content %}
+        <!-- conent block end -->
+
+
+        {% endblock %}
+        <!-- footer section -->
+       {% include 'partials/_footer.html' %}
+    </body>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %} "></script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %} "></script>
+  <script src="{% static 'js/main.js' %} "></script>
+</html>
