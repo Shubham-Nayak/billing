@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{%load static%}
+{% block title%} | Order Listing{% endblock %}
+{% load humanize %}
+
+{% block content %}
+<section id="showcase-inner" class="py-5 text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">{% if settings and settings.title %} {{settings.title}} {%endif%} Order Listing</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <section id="bc" class="mt-3">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'index' %}">
+              <i class="fas fa-home"></i> Home</a>
+          </li>
+
+        </ol>
+      </nav>
+    </div>
+  </section>
+  {% include 'partials/_alerts.html' %}
+
+  <section id="about" class="py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+            <a href="listings.html" class="btn btn-secondary text-white btn-lg" data-toggle="modal" data-target="#inquiryModal">Create Order</a>
+
+            {%if listings%}
+
+            <table class="table table-hover mt-2">
+                <thead>
+                  <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">HSN_Code</th>
+                    <th scope="col">Billing Date</th>
+                    <th scope="col">Invoice</th>
+
+
+
+
+                  </tr>
+                </thead>
+                <tbody>
+            {%for list in listings%}
+
+                  <tr>
+                    <th scope="row">{{list.id}}</th>
+                    <td>{{list.name}}</td>
+                    <td>{{list.phone}}</td>
+                    <td>{{list.discounted_price | intcomma}}.Rs</td>
+                    <td>{{list.HSN_Code}}</td>
+                    <td>{{list.purchase_date }}</td>
+                    <td><button  id="printInvoice" type="button" class="btn btn-info printInvoice" data-uid="{{list.id}}" data-name="{{list.name}}" data-phone="{{list.phone}}" data-price="{{list.discounted_price | intcomma}}" data-date="{{list.purchase_date}}" data-hsn="{{list.HSN_Code}}" data-gram="{{list.gram}}" ><i class="fa fa-print"></i>  Print</button>
+                    </td>
+
+                  </tr>
+              {%endfor%}
+                  
+                </tbody>
+              </table>
+              {%endif%}
+
+        </div>
+
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          {% if listings.has_other_pages%}
+          <ul class="pagination">
+          {% if listings.has_previous%}
+
+              <li class="page-item">
+                <a class="page-link" href="?page={{listings.previous_page_number}}">&laquo;</a>
+              </li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" >&laquo;</a>
+            </li>
+          {% endif %}
+
+          {% for i in listings.paginator.page_range %}
+          {% if listings.number == i%}
+            <li class="page-item active">
+              <a class="page-link">{{i}}</a>
+            </li>
+          {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{i}}">{{i}}</a>
+          </li>
+          {% endif %}
+
+
+
+          {% endfor%}
+
+
+          {% if listings.has_next%}
+
+              <li class="page-item">
+                <a class="page-link" href="?page={{listings.next_page_number}}">&raquo;</a>
+              </li>
+          {% else %}
+            <li class="page-item disabled">
+              <a class="page-link" >&laquo;</a>
+            </li>
+          {% endif %}
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+   <!-- Inquiry Modal -->
+   <div class="modal fade" id="inquiryModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="inquiryModalLabel">Make An Inquiry</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="{% url 'orderslisting' %}">
+            {% csrf_token %}
+
+          {% if user.is_authenticated%}
+            <input type="hidden" name="user_id" class="form-control" value="{{user.id}}" >
+
+
+          {%else%}
+            <input type="hidden" name="user_id" class="form-control" value="0" >
+
+          {%endif%}
+
+
+          <div class="form-group">
+            <label for="property_name" class="col-form-label">HSN_Code:</label>
+            <input type="text" name="HSN_Code" class="form-control"  placeholder="Enter HSN Code"
+            value="{{values.HSN_Code}}" required>
+          </div>
+          <div class="form-group">
+            <label for="property_name" class="col-form-label">Full Name:</label>
+            <input type="text" name="name" class="form-control"  placeholder="Full Name"  value="{{values.name}}" required>
+
+          </div>
+          <div class="form-group">
+            <label for="property_name" class="col-form-label">Billing Amount:</label>
+            <input type="number" name="discounted_price" class="form-control"   placeholder="Final Amount"  value="{{values.discounted_price}}">
+          </div>
+
+            <div class="form-group">
+              <label for="phone" class="col-form-label">Phone:</label>
+              <input type="number" name="phone" class="form-control" placeholder="Phone Number"  value="{{values.phone}}" required>
+            </div>
+            <div class="form-group">
+                <label for="email" class="col-form-label">Email:</label>
+                <input type="email" name="email" class="form-control" placeholder="Email Id"  value="{{values.email}}" >
+              </div>
+            <div class="form-group">
+              <label for="message" class="col-form-label">Gram:</label>
+              <input type="number" name="gram" class="form-control" placeholder="Product Weight"  value="{{values.gram}}" required>
+            </div>
+            <div class="form-group">
+                <label for="message" class="col-form-label">Saller:</label>
+            <label for="property_name" class="col-form-label">Full Name:</label>
+            <input type="text" name="saller" class="form-control" placeholder="Shop,Amazon,Flipkart,etc"  value="{{values.saller}}" >
+              </div>
+              <div class="form-group">
+                <label for="message" class="col-form-label">Purchase Mode:</label>
+            <label for="property_name" class="col-form-label">Full Name:</label>
+            <input type="text" name="purchase_mode" class="form-control" placeholder="Online,Offline"  value="{{values.purchase_mode}}" >
+              </div>
+            <hr>
+            <input type="submit" value="Send" class="btn btn-block btn-secondary">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div id="invoice" >
+    <div class="toolbar hidden-print">
+
+    <hr>
+    </div>
+    <div class="invoice my-invoice overflow-auto" id="printdata" style="display: none;">
+    <div style="min-width: 600px">
+    <header>
+    <div class="row">
+    <div class="col">
+    <a target="_blank" href="https://lobianijs.com">
+        {% if settings and settings.logo %} 
+            <img src=" {{settings.logo.url}}" data-holder-rendered="true" />
+
+        {%endif%} 
+    </a>
+    </div>
+    <div class="col company-details">
+    <h2 class="name">
+        {% if settings and settings.title %} 
+        {{settings.title}} 
+
+        {%endif%} 
+    </h2>
+    <div>
+        {% if settings and settings.address %} 
+        <b>{{settings.address}} </b>
+
+        {%endif%} 
+    </div>
+    <div>
+        {% if settings and settings.phone %} 
+        <b>Contact Number:</b> {{settings.phone}} 
+
+        {%endif%} 
+    </div>
+    <div>
+        {% if settings and settings.email %} 
+        <b>Email:</b> {{settings.email}} 
+
+        {%endif%} 
+    </div>
+    </div>
+    </div>
+    </header>
+    <main>
+    <div class="row contacts">
+    <div class="col invoice-to">
+    <div class="text-gray-light mt-2">INVOICE TO:</div>
+    <h2 class="to"></h2>
+    <div class="address"></div>
+    <div class="phone"></div>
+    </div>
+    <div class="col invoice-details">
+    <h1 class="hsn"></h1>
+    <div class="date">Date of Invoice: 01/10/2018</div>
+    </div>
+    </div>
+    <table border="0" cellspacing="0" cellpadding="0">
+    <thead>
+    <tr>
+    <th>No</th>
+    <th class="text-left" style="padding: 20px;">HSN_Code</th>
+    <th class="text-right" style="padding: 20px;">Gram</th>
+    <th class="text-right" style="padding: 20px;">Discount</th>
+    <th class="text-right" style="padding: 20px;">Total</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr>
+    <td class="no text-left"  style="padding: 20px;">04</td>
+    <td class="text-left"  style="padding: 20px;"><h3 class="hsn_code"> NA</h3>
+    </td>
+    <td class="gram text-left"  style="padding: 20px;">0</td>
+    <td class="discount text-left"  style="padding: 20px;">0</td>
+    <td class="total text-left"  style="padding: 20px;">0.00 Rs</td>
+    </tr>
+ 
+    </tbody>
+    <tfoot>
+ 
+    <tr>
+    <td colspan="2"></td>
+    <td colspan="2">TAX</td>
+    <td class="tax">0</td>
+    </tr>
+    <tr>
+    <td colspan="2"></td>
+    <td colspan="2">GRAND TOTAL</td>
+    <td class="grand-total"></td>
+    </tr>
+    </tfoot>
+    </table>
+    <div class="thanks">Thank you!</div>
+    <div class="notices">
+    <div>NOTICE:</div>
+    <div class="notice">No refund avialble. please check product before leving counter</div>
+    </div>
+    </main>
+    <footer>
+    Exchange policy valid withing 7 days from date of billing.
+    </footer>
+    </div>
+    <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+    <div></div>
+    </div>
+    </div> 
+
+
+{% endblock %}

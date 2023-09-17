@@ -5,7 +5,7 @@ from myapp.models import ProductListing
 # Create your models here.
 
 class Order(models.Model):
-    HSN_Code= models.ForeignKey(ProductListing,on_delete=models.DO_NOTHING)
+    HSN_Code= models.CharField(max_length=200)
     name= models.CharField(max_length=200)
     phone= models.CharField(max_length=20)
     email= models.CharField(max_length=50)

@@ -15,6 +15,7 @@ class Mysetting(models.Model):
     twitter= models.CharField(max_length=50,blank=True)
     theme_color= ColorField(default='#10284e',blank=True)
     logo=models.ImageField(upload_to='photos/img/',blank=True)
+    address=models.CharField(max_length=50,blank=True)
 
     def __str__(self):
         return self.title

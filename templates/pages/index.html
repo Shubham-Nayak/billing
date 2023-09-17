@@ -14,7 +14,9 @@
            MyApp 
           {%endif%}
       </h2>
-      <button class="btn btn-1 btn-1e"> <a href="{{request.build_absolute_uri}}/admin">Dashboard </a></button>
+      <button class="btn btn-info" id="printInvoice"> <a href="{{request.build_absolute_uri}}/admin">Dashboard </a></button>
+      <button class="btn btn-info" id="printInvoice"> <a href="{% url 'orderslisting'%}">Billing </a></button>
+
   </div>
 </div>
 
